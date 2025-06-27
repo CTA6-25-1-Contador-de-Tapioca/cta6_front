@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MyChart } from '@/components/MyChart';
+import { MyChart } from '@/components/columnChart';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -13,6 +13,7 @@ import {
 import { io, Socket } from 'socket.io-client';
 import {
   Card,
+  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -24,6 +25,41 @@ type BagDataPoint = {
   bagType: string;
 };
 let socket: Socket;
+
+export function formatTimeUnit(duration: string): string {
+  const match = duration.match(/^(\d+)([smhdw])$/);
+
+  if (!match) {
+    return duration; // Retorna o valor original se não conseguir fazer o parse
+  }
+
+  const value = parseInt(match[1]);
+  const unit = match[2];
+
+  let unitName: string;
+  switch (unit) {
+    case 's':
+      unitName = value === 1 ? 'segundo' : 'segundos';
+      break;
+    case 'm':
+      unitName = value === 1 ? 'minuto' : 'minutos';
+      break;
+    case 'h':
+      unitName = value === 1 ? 'hora' : 'horas';
+      break;
+    case 'd':
+      unitName = value === 1 ? 'dia' : 'dias';
+      break;
+    case 'w':
+      unitName = value === 1 ? 'semana' : 'semanas';
+      break;
+    default:
+      return duration; // Retorna o valor original se a unidade for desconhecida
+  }
+
+  return `${value} ${unitName}`;
+}
+
 function parseSingleDuration(duration: string): number {
   const match = duration.match(/^(\d+)([smhdw])$/);
 
@@ -55,11 +91,12 @@ function getTimeBucket(date: Date, intervalMs: number): number {
 }
 
 function getGroupInterval(period: string): string {
-  if (period === '1d') return '1m';
+  if (period === '1d') return '30m';
   if (period === '7d') return '1d';
   if (period === '30d') return '1d';
   return '1h';
 }
+
 export default function Home() {
   const [bagType, setBagType] = useState('1kg');
   const [period, setPeriod] = useState('1d');
@@ -138,34 +175,6 @@ export default function Home() {
   }, [bagType, period]);
 
   return (
-    // <div className='space-y-6 p-6'>
-    //   <div className='space-y-2'>
-    //     <Label>Tipo de Saco</Label>
-    //     <Select value={bagType} onValueChange={setBagType}>
-    //       <SelectTrigger className='w-[200px]'>
-    //         <SelectValue />
-    //       </SelectTrigger>
-    //       <SelectContent>
-    //         <SelectItem value='800g'>800g</SelectItem>
-    //         <SelectItem value='1kg'>1kg</SelectItem>
-    //         <SelectItem value='2kg'>2kg</SelectItem>
-    //       </SelectContent>
-    //     </Select>
-    //
-    //     <Label>Periodo</Label>
-    //     <Select value={period} onValueChange={setPeriod}>
-    //       <SelectTrigger className='w-[200px]'>
-    //         <SelectValue />
-    //       </SelectTrigger>
-    //       <SelectContent>
-    //         <SelectItem value='1d'>1 dia</SelectItem>
-    //         <SelectItem value='30d'>30 dias</SelectItem>
-    //       </SelectContent>
-    //     </Select>
-    //   </div>
-    //
-    //   <MyChart data={dados} />
-    // </div>
     <div className='space-y-8 p-8'>
       <div className='flex w-full space-x-4'>
         <div className='flex items-center space-x-2'>
@@ -231,7 +240,22 @@ export default function Home() {
           </CardHeader>
         </Card>
       </div>
-      <div className='h-full w-full'></div>
+      <div className='flex h-[calc(100vh-300px)] space-x-8'>
+        <Card className='w-1/2'>
+          <CardHeader>
+            <CardTitle className='text-3xl'>Contagem de Sacos</CardTitle>
+            <CardDescription>
+              Sacos de {bagType} em um Período de {formatTimeUnit(period)}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className='h-full'>
+            <MyChart data={dados} />
+          </CardContent>
+        </Card>
+        <Card className='w-1/2'>
+          <CardContent className='h-full'></CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
