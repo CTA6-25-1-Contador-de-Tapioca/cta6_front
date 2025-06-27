@@ -27,8 +27,10 @@ type BagDataPoint = {
 let socket: Socket;
 
 export function formatTimeUnit(duration: string): string {
+  if (duration === 'today') {
+    return 'Hoje';
+  }
   const match = duration.match(/^(\d+)([smhdw])$/);
-
   if (!match) {
     return duration; // Retorna o valor original se não conseguir fazer o parse
   }
@@ -99,8 +101,9 @@ function getGroupInterval(period: string): string {
 
 export default function Home() {
   const [bagType, setBagType] = useState('1kg');
-  const [period, setPeriod] = useState('1d');
+  const [period, setPeriod] = useState('today');
   const [dados, setDados] = useState<BagDataPoint[]>([]);
+  const [dailyPackageCount, setDailyPackageCount] = useState(0);
 
   useEffect(() => {
     // Conecta ao socket.io no servidor
@@ -113,6 +116,12 @@ export default function Home() {
 
       // Assina o tipo atual
       socket.emit('subscribe', { bagType });
+    });
+
+    socket.on('daily', (data: { count: number }) => {
+      setDailyPackageCount((prev) => {
+        return data.count + prev;
+      });
     });
 
     // Recebe dados em tempo real
@@ -159,19 +168,27 @@ export default function Home() {
     };
   }, [bagType]);
   useEffect(() => {
-    async function fetchDados() {
+    async function fetchData() {
       try {
-        const res = await fetch(
+        // Fetch historical data
+        const historyRes = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/dados?period=${period}&bagType=${bagType}&groupInterval=${getGroupInterval(period)}`
         );
-        const json: BagDataPoint[] = await res.json();
-        console.log('Dados recebidos:', json);
-        setDados(json);
+        const historyJson: BagDataPoint[] = await historyRes.json();
+        setDados(historyJson);
+
+        // Fetch daily count
+        const dailyRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/dados/daily?bagType=${bagType}`
+        );
+        const dailyJson = await dailyRes.json();
+        console.log('Daily count:', dailyJson);
+        setDailyPackageCount(dailyJson.countToday);
       } catch (err) {
-        console.error('Erro ao buscar dados iniciais:', err);
+        console.error('Erro ao buscar dados:', err);
       }
     }
-    fetchDados();
+    fetchData();
   }, [bagType, period]);
 
   return (
@@ -199,7 +216,7 @@ export default function Home() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value='1d'>1 dia</SelectItem>
+              <SelectItem value='today'>Hoje</SelectItem>
               <SelectItem value='7d'>7 dias</SelectItem>
               <SelectItem value='30d'>30 dias</SelectItem>
             </SelectContent>
@@ -211,7 +228,7 @@ export default function Home() {
           <CardHeader>
             <CardDescription>Sacos do dia</CardDescription>
             <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-              1,250.00
+              {dailyPackageCount} sacos
             </CardTitle>
           </CardHeader>
         </Card>
