@@ -1,6 +1,6 @@
 'use client';
 
-import { Bar, BarChart, XAxis, YAxis, Tooltip } from 'recharts';
+import { Bar, BarChart, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from './ui/chart';
 
 type BagDataPoint = {
@@ -11,12 +11,13 @@ type BagDataPoint = {
 
 interface MyChartProps {
   data: BagDataPoint[];
+  className?: string;
 }
 
-export function MyChart({ data }: MyChartProps) {
+export function MyChart({ data, className }: MyChartProps) {
   return (
     <ChartContainer
-      className='h-[600px] w-full'
+      className={`${className}`}
       config={{
         xAxis: {
           label: 'Horário',
@@ -29,6 +30,7 @@ export function MyChart({ data }: MyChartProps) {
       <BarChart data={data}>
         <XAxis dataKey='timestamp' />
         <YAxis />
+        <CartesianGrid />
         <Tooltip content={<ChartTooltipContent />} />
         <Bar dataKey='count' fill='#4f46e5' radius={[4, 4, 0, 0]} />
       </BarChart>
