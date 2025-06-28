@@ -25,6 +25,7 @@ import {
   getTimeBucket,
   formatTimeUnit,
 } from '@/lib/utils';
+import { BagPieChart } from '@/components/pieChart';
 
 let socket: Socket;
 
@@ -33,6 +34,7 @@ export default function Home() {
   const [period, setPeriod] = useState('today');
   const [dados, setDados] = useState<BagDataPoint[]>([]);
   const [dailyPackageCount, setDailyPackageCount] = useState(0);
+  const [byBagType, setByBagType] = useState<BagDataPoint[]>([]);
 
   useEffect(() => {
     // Conecta ao socket.io no servidor
@@ -95,7 +97,7 @@ export default function Home() {
     return () => {
       socket.disconnect();
     };
-  }, [bagType]);
+  }, [bagType, period]);
   useEffect(() => {
     async function fetchData() {
       try {
@@ -111,14 +113,30 @@ export default function Home() {
           `${process.env.NEXT_PUBLIC_API_URL}/dados/daily?bagType=${bagType}`
         );
         const dailyJson = await dailyRes.json();
-        console.log('Daily count:', dailyJson);
         setDailyPackageCount(dailyJson.countToday);
+
+        // Fetch bag type distribution
       } catch (err) {
         console.error('Erro ao buscar dados:', err);
       }
     }
     fetchData();
   }, [bagType, period]);
+
+  useEffect(() => {
+    async function fetchByBagType() {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/dados/byBagType?period=${period}`
+        );
+        const json: BagDataPoint[] = await res.json();
+        setByBagType(json);
+      } catch (err) {
+        console.error('Erro ao buscar distribuição por tipo de saco:', err);
+      }
+    }
+    fetchByBagType();
+  }, [period]);
 
   return (
     <div className='space-y-8 p-8'>
@@ -199,7 +217,16 @@ export default function Home() {
           </CardContent>
         </Card>
         <Card className='w-1/2'>
-          <CardContent className='h-full'></CardContent>
+          <CardHeader>
+            <CardTitle className='text-3xl'>Distribuição por Tipo</CardTitle>
+            <CardDescription>
+              Distribuição dos tipos de sacos no período de
+              {formatTimeUnit(period)}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className='h-full'>
+            <BagPieChart data={byBagType} />
+          </CardContent>
         </Card>
       </div>
     </div>
