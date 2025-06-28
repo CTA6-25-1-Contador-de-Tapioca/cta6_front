@@ -205,7 +205,7 @@ export default function Home() {
         </Card>
       </div>
       <div className='flex h-[calc(100vh-300px)] space-x-8'>
-        <Card className='w-1/2'>
+        <Card className='w-1/2 space-y-8'>
           <CardHeader>
             <CardTitle className='text-3xl'>Contagem de Sacos</CardTitle>
             <CardDescription>
@@ -216,11 +216,11 @@ export default function Home() {
             <MyChart data={dados} />
           </CardContent>
         </Card>
-        <Card className='w-1/2'>
+        <Card className='w-1/2 space-y-8'>
           <CardHeader>
             <CardTitle className='text-3xl'>Distribuição por Tipo</CardTitle>
             <CardDescription>
-              Distribuição dos tipos de sacos no período de
+              Distribuição dos tipos de sacos no período de{' '}
               {formatTimeUnit(period)}
             </CardDescription>
           </CardHeader>
