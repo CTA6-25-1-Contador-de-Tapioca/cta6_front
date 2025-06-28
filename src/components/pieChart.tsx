@@ -32,7 +32,7 @@ export function BagPieChart({ data }: BagPieChartProps) {
               data={data}
               cx='50%'
               cy='50%'
-              outerRadius={100}
+              outerRadius={150}
               label={({ name, percent }) =>
                 `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`
               }
@@ -54,7 +54,7 @@ export function BagPieChart({ data }: BagPieChartProps) {
         {data.map((item, index) => (
           <li
             key={item.bagType}
-            className='flex items-center justify-between text-sm'
+            className='flex items-center justify-between text-xl'
           >
             <div className='flex items-center gap-2'>
               <span
