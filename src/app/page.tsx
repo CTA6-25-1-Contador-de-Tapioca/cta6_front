@@ -18,86 +18,15 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  BagDataPoint,
+  parseSingleDuration,
+  getGroupInterval,
+  getTimeBucket,
+  formatTimeUnit,
+} from '@/lib/utils';
 
-type BagDataPoint = {
-  timestamp: string;
-  count: number;
-  bagType: string;
-};
 let socket: Socket;
-
-export function formatTimeUnit(duration: string): string {
-  if (duration === 'today') {
-    return 'Hoje';
-  }
-  const match = duration.match(/^(\d+)([smhdw])$/);
-  if (!match) {
-    return duration; // Retorna o valor original se não conseguir fazer o parse
-  }
-
-  const value = parseInt(match[1]);
-  const unit = match[2];
-
-  let unitName: string;
-  switch (unit) {
-    case 's':
-      unitName = value === 1 ? 'segundo' : 'segundos';
-      break;
-    case 'm':
-      unitName = value === 1 ? 'minuto' : 'minutos';
-      break;
-    case 'h':
-      unitName = value === 1 ? 'hora' : 'horas';
-      break;
-    case 'd':
-      unitName = value === 1 ? 'dia' : 'dias';
-      break;
-    case 'w':
-      unitName = value === 1 ? 'semana' : 'semanas';
-      break;
-    default:
-      return duration; // Retorna o valor original se a unidade for desconhecida
-  }
-
-  return `${value} ${unitName}`;
-}
-
-function parseSingleDuration(duration: string): number {
-  const match = duration.match(/^(\d+)([smhdw])$/);
-
-  if (!match) {
-    throw new Error(`Formato inválido de duração: "${duration}"`);
-  }
-
-  const value = parseInt(match[1]);
-  const unit = match[2];
-
-  switch (unit) {
-    case 's':
-      return value * 1000;
-    case 'm':
-      return value * 60 * 1000;
-    case 'h':
-      return value * 60 * 60 * 1000;
-    case 'd':
-      return value * 24 * 60 * 60 * 1000;
-    case 'w':
-      return value * 7 * 24 * 60 * 60 * 1000;
-    default:
-      throw new Error(`Unidade inválida: "${unit}"`);
-  }
-}
-
-function getTimeBucket(date: Date, intervalMs: number): number {
-  return Math.floor(date.getTime() / intervalMs);
-}
-
-function getGroupInterval(period: string): string {
-  if (period === '1d') return '30m';
-  if (period === '7d') return '1d';
-  if (period === '30d') return '1d';
-  return '1h';
-}
 
 export default function Home() {
   const [bagType, setBagType] = useState('1kg');
@@ -262,7 +191,7 @@ export default function Home() {
           <CardHeader>
             <CardTitle className='text-3xl'>Contagem de Sacos</CardTitle>
             <CardDescription>
-              Sacos de {bagType} em um Período de {formatTimeUnit(period)}
+              Sacos de {bagType} no Período de {formatTimeUnit(period)}
             </CardDescription>
           </CardHeader>
           <CardContent className='h-full'>
