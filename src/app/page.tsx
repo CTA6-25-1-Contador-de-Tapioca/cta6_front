@@ -55,6 +55,21 @@ export default function Home() {
       });
     });
 
+    socket.on('byBagType', (data: { count: number; bagType: string }) => {
+      setByBagType((prev) => {
+        const updatedData = prev.map((item) => {
+          if (item.bagType === data.bagType) {
+            return {
+              ...item,
+              count: item.count + data.count,
+            };
+          }
+          return item;
+        });
+        return updatedData;
+      });
+    });
+
     // Recebe dados em tempo real
     socket.on('novo-dado', (novoDado: any) => {
       const rawDate = new Date(novoDado.timestamp);
