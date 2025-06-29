@@ -38,6 +38,28 @@ export default function Home() {
   const [byBagType, setByBagType] = useState<BagDataPoint[]>([]);
 
   useEffect(() => {
+    async function fetchData() {
+      try {
+        // Fetch historical data
+        const historyRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/dados?period=${period}&bagType=${bagType}&groupInterval=${getGroupInterval(period)}`
+        );
+        const historyJson: BagDataPoint[] = await historyRes.json();
+        setDados(historyJson);
+
+        // Fetch daily count
+        const dailyRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/dados/daily?bagType=${bagType}`
+        );
+        const dailyJson = await dailyRes.json();
+        setDailyPackageCount(dailyJson.countToday);
+
+        // Fetch bag type distribution
+      } catch (err) {
+        console.error('Erro ao buscar dados:', err);
+      }
+    }
+    fetchData();
     // Conecta ao socket.io no servidor
     socket = io(process.env.NEXT_PUBLIC_API_URL as string, {
       transports: ['websocket'],
@@ -113,30 +135,6 @@ export default function Home() {
     return () => {
       socket.disconnect();
     };
-  }, [bagType, period]);
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        // Fetch historical data
-        const historyRes = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/dados?period=${period}&bagType=${bagType}&groupInterval=${getGroupInterval(period)}`
-        );
-        const historyJson: BagDataPoint[] = await historyRes.json();
-        setDados(historyJson);
-
-        // Fetch daily count
-        const dailyRes = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/dados/daily?bagType=${bagType}`
-        );
-        const dailyJson = await dailyRes.json();
-        setDailyPackageCount(dailyJson.countToday);
-
-        // Fetch bag type distribution
-      } catch (err) {
-        console.error('Erro ao buscar dados:', err);
-      }
-    }
-    fetchData();
   }, [bagType, period]);
 
   useEffect(() => {
