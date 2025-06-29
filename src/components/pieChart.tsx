@@ -11,14 +11,7 @@ interface BagPieChartProps {
   data: BagCountData[];
 }
 
-const COLORS = [
-  '#4285F4',
-  '#34A853',
-  '#FBBC05',
-  '#EA4335',
-  '#A142F4',
-  '#46BDC6',
-];
+const COLORS = ['#4285F4', '#34A853', '#FBBC05', '#EA4335', '#A142F4', '#46BDC6'];
 
 export function BagPieChart({ data }: BagPieChartProps) {
   return (
@@ -33,16 +26,11 @@ export function BagPieChart({ data }: BagPieChartProps) {
               cx='50%'
               cy='50%'
               outerRadius={150}
-              label={({ name, percent }) =>
-                `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`
-              }
+              label={({ name, percent }) => `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`}
               paddingAngle={3}
             >
               {data.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
             <Tooltip formatter={(value: number) => `${value} sacos`} />
@@ -52,10 +40,7 @@ export function BagPieChart({ data }: BagPieChartProps) {
 
       <ul className='w-full space-y-1 px-4'>
         {data.map((item, index) => (
-          <li
-            key={item.bagType}
-            className='flex items-center justify-between text-xl'
-          >
+          <li key={item.bagType} className='flex items-center justify-between text-xl'>
             <div className='flex items-center gap-2'>
               <span
                 className='h-3 w-3 rounded-full'
