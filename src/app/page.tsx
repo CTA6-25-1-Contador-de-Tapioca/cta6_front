@@ -20,7 +20,7 @@ import {
   formatTimeUnit,
 } from '@/lib/utils';
 import { BagPieChart } from '@/components/pieChart';
-import { BarChart, Package } from 'lucide-react';
+import { BarChart, Clock, Package } from 'lucide-react';
 
 let socket: Socket;
 
@@ -31,6 +31,7 @@ export default function Home() {
   const [dailyPackageCount, setDailyPackageCount] = useState(0);
   const [byBagType, setByBagType] = useState<BagDataPoint[]>([]);
   const [average, setAverage] = useState('');
+  const [productionDuration, setProductionDuration] = useState('');
 
   useEffect(() => {
     async function fetchData() {
@@ -158,6 +159,28 @@ export default function Home() {
     fetchAverage();
   }, [bagType]);
 
+  useEffect(() => {
+    async function fetchProductionDuration() {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dados/productionDuration`);
+        if (!res.ok) {
+          if (res.status === 400) {
+            setProductionDuration('Não iniciada');
+            return;
+          }
+          throw new Error('Erro ao buscar duração');
+        }
+        const data = await res.json();
+        console.log('Duração da produção:', data);
+        setProductionDuration(data.duration);
+      } catch (err) {
+        console.error('Erro ao buscar duração da produção:', err);
+        setProductionDuration('Erro');
+      }
+    }
+    fetchProductionDuration();
+  }, []);
+
   return (
     <div className='space-y-8 p-8'>
       <div className='flex w-full space-x-4'>
@@ -210,15 +233,18 @@ export default function Home() {
               <BarChart className='h-6 w-6' />
             </CardDescription>
             <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-              {average} sacos/hora
+              {Number(average).toFixed(2)} sacos/hora
             </CardTitle>
           </CardHeader>
         </Card>
         <Card className='w-full'>
           <CardHeader>
-            <CardDescription> trocar informação</CardDescription>
+            <CardDescription className='flex w-full items-center justify-between'>
+              <p>Duração da Produção</p>
+              <Clock className='h-6 w-6' />
+            </CardDescription>
             <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-              trocar informação
+              {productionDuration} horas
             </CardTitle>
           </CardHeader>
         </Card>
