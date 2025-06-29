@@ -11,13 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { io, Socket } from 'socket.io-client';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   BagDataPoint,
   parseSingleDuration,
@@ -26,7 +20,7 @@ import {
   formatTimeUnit,
 } from '@/lib/utils';
 import { BagPieChart } from '@/components/pieChart';
-import { Package } from 'lucide-react';
+import { BarChart, Package } from 'lucide-react';
 
 let socket: Socket;
 
@@ -104,15 +98,9 @@ export default function Home() {
 
         if (prev.length > 0) {
           const lastItem = prev[prev.length - 1];
-          const lastBucket = getTimeBucket(
-            new Date(lastItem.timestamp),
-            intervalMs
-          );
+          const lastBucket = getTimeBucket(new Date(lastItem.timestamp), intervalMs);
 
-          if (
-            lastBucket === newBucket &&
-            lastItem.bagType === novoDado.bagType
-          ) {
+          if (lastBucket === newBucket && lastItem.bagType === novoDado.bagType) {
             const atualizado = [...prev];
             atualizado[prev.length - 1] = {
               ...lastItem,
@@ -244,23 +232,22 @@ export default function Home() {
         </Card>
       </div>
       <div className='flex h-[calc(100vh-300px)] space-x-8'>
-        <Card className='w-full space-y-8'>
+        <Card className='w-full'>
           <CardHeader>
             <CardTitle className='text-3xl'>Contagem de Sacos</CardTitle>
             <CardDescription>
               Sacos de {bagType} no Período de {formatTimeUnit(period)}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className=''>
             <BagColumnChart data={dados} />
           </CardContent>
         </Card>
-        <Card className='w-1/2 space-y-8'>
+        <Card className='w-1/2'>
           <CardHeader>
             <CardTitle className='text-3xl'>Distribuição por Tipo</CardTitle>
             <CardDescription>
-              Distribuição dos tipos de sacos no período de{' '}
-              {formatTimeUnit(period)}
+              Distribuição dos tipos de sacos no período de {formatTimeUnit(period)}
             </CardDescription>
           </CardHeader>
           <CardContent className='h-full'>
