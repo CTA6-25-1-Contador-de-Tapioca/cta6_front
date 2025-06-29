@@ -14,7 +14,7 @@ interface MyChartProps {
   className?: string;
 }
 
-export function MyChart({ data, className }: MyChartProps) {
+export function BagColumnChart({ data, className }: MyChartProps) {
   return (
     <ChartContainer
       className={`${className}`}

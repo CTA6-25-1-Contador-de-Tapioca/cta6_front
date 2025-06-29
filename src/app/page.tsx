@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MyChart } from '@/components/columnChart';
+import { BagColumnChart } from '@/components/columnChart';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -26,6 +26,7 @@ import {
   formatTimeUnit,
 } from '@/lib/utils';
 import { BagPieChart } from '@/components/pieChart';
+import { Package } from 'lucide-react';
 
 let socket: Socket;
 
@@ -188,8 +189,12 @@ export default function Home() {
       <div className='flex w-full justify-between space-x-8'>
         <Card className='w-full'>
           <CardHeader>
-            <CardDescription>Sacos do dia</CardDescription>
-            <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
+            <CardDescription className='flex w-full items-center justify-between'>
+              <p>Sacos do dia</p>
+
+              <Package className='h-6 w-6' />
+            </CardDescription>
+            <CardTitle className='flex items-center gap-2 text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
               {dailyPackageCount} sacos
             </CardTitle>
           </CardHeader>
@@ -220,15 +225,15 @@ export default function Home() {
         </Card>
       </div>
       <div className='flex h-[calc(100vh-300px)] space-x-8'>
-        <Card className='w-1/2 space-y-8'>
+        <Card className='w-full space-y-8'>
           <CardHeader>
             <CardTitle className='text-3xl'>Contagem de Sacos</CardTitle>
             <CardDescription>
               Sacos de {bagType} no Período de {formatTimeUnit(period)}
             </CardDescription>
           </CardHeader>
-          <CardContent className='h-full'>
-            <MyChart data={dados} />
+          <CardContent>
+            <BagColumnChart data={dados} />
           </CardContent>
         </Card>
         <Card className='w-1/2 space-y-8'>
