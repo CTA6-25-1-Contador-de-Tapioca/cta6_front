@@ -36,6 +36,7 @@ export default function Home() {
   const [dados, setDados] = useState<BagDataPoint[]>([]);
   const [dailyPackageCount, setDailyPackageCount] = useState(0);
   const [byBagType, setByBagType] = useState<BagDataPoint[]>([]);
+  const [average, setAverage] = useState('');
 
   useEffect(() => {
     async function fetchData() {
@@ -152,6 +153,23 @@ export default function Home() {
     fetchByBagType();
   }, [period]);
 
+  useEffect(() => {
+    async function fetchAverage() {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/dados/avgPerHour?bagType=${bagType}`
+        );
+        const data = await res.json();
+        console.log('Média por hora:', data);
+        setAverage(data.averagePerHour);
+        // Handle the average data as needed
+      } catch (err) {
+        console.error('Erro ao buscar média:', err);
+      }
+    }
+    fetchAverage();
+  }, [bagType]);
+
   return (
     <div className='space-y-8 p-8'>
       <div className='flex w-full space-x-4'>
@@ -199,9 +217,12 @@ export default function Home() {
         </Card>
         <Card className='w-full'>
           <CardHeader>
-            <CardDescription> trocar informação</CardDescription>
+            <CardDescription className='flex w-full items-center justify-between'>
+              <p>Média por hora</p>
+              <BarChart className='h-6 w-6' />
+            </CardDescription>
             <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-              trocar informação
+              {average} sacos/hora
             </CardTitle>
           </CardHeader>
         </Card>
