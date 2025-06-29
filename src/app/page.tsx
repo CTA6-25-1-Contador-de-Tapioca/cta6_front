@@ -89,7 +89,7 @@ export default function Home() {
     });
 
     // Recebe dados em tempo real
-    socket.on('novo-dado', (novoDado: any) => {
+    socket.on('novo-dado', (novoDado: { timestamp: string; bagType: string }) => {
       const rawDate = new Date(novoDado.timestamp);
 
       setDados((prev) => {
