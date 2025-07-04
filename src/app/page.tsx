@@ -266,7 +266,7 @@ export default function Home() {
             </CardDescription>
           </CardHeader>
           <CardContent className=''>
-            <BagColumnChart data={dados} />
+            <BagColumnChart data={dados} period={period} />
           </CardContent>
         </Card>
         <Card className='w-1/2'>

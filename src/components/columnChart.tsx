@@ -11,9 +11,49 @@ type BagDataPoint = {
 
 interface MyChartProps {
   data: BagDataPoint[];
+  period: string;
   className?: string;
 }
-export function BagColumnChart({ data, className }: MyChartProps) {
+export function BagColumnChart({ data, period, className }: MyChartProps) {
+  // Função para formatar a data/hora com base no período
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+
+    if (period === 'today') {
+      // Para hoje, mostra apenas a hora (HH:MM)
+      return date.toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } else if (period === '7d') {
+      // Para 7 dias, mostra dia da semana e dia do mês
+      return date.toLocaleDateString('pt-BR', {
+        weekday: 'short',
+        day: '2-digit',
+        month: '2-digit',
+      });
+    } else if (period === '30d') {
+      // Para 30 dias, mostra dia/mês
+      return date.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+      });
+    }
+
+    // Fallback para outros períodos
+    return date.toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  // Processa os dados para incluir timestamp formatado
+  const processedData = data.map((item) => ({
+    ...item,
+    formattedTimestamp: formatTimestamp(item.timestamp),
+  }));
   return (
     <ChartContainer
       className={`${className}`}
@@ -28,8 +68,8 @@ export function BagColumnChart({ data, className }: MyChartProps) {
     >
       <div className='w-full'>
         <ResponsiveContainer width='95%' height='90%'>
-          <BarChart data={data}>
-            <XAxis dataKey='timestamp' />
+          <BarChart data={processedData}>
+            <XAxis dataKey='formattedTimestamp' />
             <YAxis />
             <CartesianGrid />
             <Tooltip content={<ChartTooltipContent />} />
